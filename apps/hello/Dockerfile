@@ -1,4 +1,4 @@
-FROM node as build-deps
+FROM node
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn --version
