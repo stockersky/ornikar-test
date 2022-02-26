@@ -87,13 +87,14 @@ So, I'll use this [Docker Node image](https://hub.docker.com/_/node).
 
 Here is the Dockerfile :
 ```
-FROM node as build-deps
+FROM node
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn --version
-COPY . ./
+ADD src ./src
 RUN yarn install
 ENTRYPOINT ["yarn", "run", "start"]
+
 ```
 
 For production purpose, I would advice using a Docker multistage build where you'll
@@ -119,3 +120,23 @@ But had those errors :
 
 Well, I don't know much about php but it this image has a php version > 8. 
 So, I went with a base php image with specific version of '7' and installed `composer` inside it.
+
+Here is the Dockerfile :
+
+````
+FROM php:7-fpm
+
+WORKDIR /composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+RUN mv composer.phar /usr/local/bin/composer
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN apt-get update && apt-get install -y git
+RUN composer install
+
+ADD public ./public
+ENTRYPOINT ["composer", "run", "dev:start"]
+````
