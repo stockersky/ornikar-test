@@ -76,6 +76,37 @@ Sounds like Ornikar likes Helm. Great !
 version.BuildInfo{Version:"v3.8.0", GitCommit:"d14138609b01886f544b2025f5000351c9eb092e", GitTreeState:"clean", GoVersion:"go1.17.6"}
 ```
 
+Install Traefik with Helm : https://github.com/traefik/traefik-helm-chart
+
+````
+helm repo add traefik https://helm.traefik.io/traefik
+helm repo update
+helm install traefik traefik/traefik
+
+k get po
+NAME                               READY   STATUS    RESTARTS      AGE
+coredns-64897985d-wkh4h            1/1     Running   0             59m
+etcd-minikube                      1/1     Running   0             59m
+kube-apiserver-minikube            1/1     Running   0             59m
+kube-controller-manager-minikube   1/1     Running   0             59m
+kube-proxy-xcnb2                   1/1     Running   0             59m
+kube-scheduler-minikube            1/1     Running   0             59m
+storage-provisioner                1/1     Running   1 (59m ago)   59m
+traefik-68cc69f688-c8skf           1/1     Running   0             4m37s
+
+k get svc
+NAME       TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+kube-dns   ClusterIP      10.96.0.10    <none>        53/UDP,53/TCP,9153/TCP       59m
+traefik    LoadBalancer   10.99.28.72   <pending>     80:31529/TCP,443:30136/TCP   4m43s
+````
+
+Dashboard :
+`kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000`
+
+
+
+
+
 
 ## Containerize applications
 
@@ -100,6 +131,9 @@ ENTRYPOINT ["yarn", "run", "start"]
 For production purpose, I would advice using a Docker multistage build where you'll
 - first build your NodeJs binary using the Node image
 - finally use a Nginx or Httpd image containing the preceding build.
+
+Build : `docker build -t stockersky/ornikar-hello .`
+push to Dockerhub : `docker push stockersky/ornikar-hello`
 
 ### World app
 
@@ -140,3 +174,11 @@ RUN composer install
 ADD public ./public
 ENTRYPOINT ["composer", "run", "dev:start"]
 ````
+
+Build : `docker build -t stockersky/ornikar-world .`
+push to Dockerhub : `docker push stockersky/ornikar-world`
+
+## Package applications
+
+Package app with [Helm](https://helm.sh/)
+
