@@ -81,7 +81,7 @@ Install Traefik with Helm : https://github.com/traefik/traefik-helm-chart
 ````
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
-helm install traefik traefik/traefik
+helm install traefik traefik/traefik -n kube-system
 
 k get po
 NAME                               READY   STATUS    RESTARTS      AGE
@@ -101,9 +101,9 @@ traefik    LoadBalancer   10.99.28.72   <pending>     80:31529/TCP,443:30136/TCP
 ````
 
 Dashboard :
-`kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000`
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name -n kube-system) 9000:9000 -n kube-system
 
-
+Browser : http://127.0.0.1:9000/dashboard/#/
 
 
 
@@ -182,3 +182,12 @@ push to Dockerhub : `docker push stockersky/ornikar-world`
 
 Package app with [Helm](https://helm.sh/)
 
+
+
+
+
+# NOTES
+
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+
+k port-forward svc/ornikar-hello-ornikar-helm-chart 5000:80
