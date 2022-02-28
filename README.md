@@ -105,7 +105,8 @@ kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traef
 
 Browser : http://127.0.0.1:9000/dashboard/#/
 
-
+> To be honest, I did not succeed to deploy the apps ingresses with `traefik`. 
+> Instead, I installed nginx in Minikube : `minikube addons enable ingress`.
 
 
 ## Containerize applications
@@ -182,12 +183,51 @@ push to Dockerhub : `docker push stockersky/ornikar-world`
 
 Package app with [Helm](https://helm.sh/)
 
+### Create the Helm Chart
+
+`helm create ornikar-helm-chart`
+
+### Values files
+
+For this project, the two micro-services use the same Chart but have their own Values files.
+This way, each micro-service `hello` and `world` can be create / updated / uninstalled on their own.
+
+The whole Helm thing is located in the directory `ornikar-helm-chart` of this project.
+
+- `hello-values.yaml` contains values for app `hello`
+- `world-values.yaml` contains values for app `world`
 
 
+Usually, I would locate those files in the app repo, not in the Chart repo.
+
+## Deploy applications
+
+### hello
+
+`helm upgrade --install ornikar-hello ./ornikar-helm-chart/. -f ./ornikar-helm-chart/hello-values.yaml`
 
 
-# NOTES
+### world
 
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+`helm upgrade --install ornikar-world ./ornikar-helm-chart/. -f ./ornikar-helm-chart/world-values.yaml`
 
-k port-forward svc/ornikar-hello-ornikar-helm-chart 5000:80
+
+## final test
+
+Port-forward Nginx Ingress Controler to localhost :
+
+`k port-forward svc/ingress-nginx-controller 8080:80 -n ingress-nginx`
+
+test :
+
+`curl http://ornikar.dev:8080/hello` --> Display Hello
+
+`curl http://ornikar.dev:8080/world` --> ERROR
+
+
+## NOTES
+
+Php server executed through composer seems to have a sort of timeout. It never passed Readiness / liveness probes.
+
+I know the Kube Service associated with it worked as I got the "World" displayed while testing the Service. But even directly in Docker it does not work properly.
+I guess, I'd have to dig in Php. But, unfortunately, I don't have the time for that :( .
