@@ -1,4 +1,4 @@
-# Test technique Ornikar
+# Ornikar technical test
 
 https://github.com/ornikar/cloud-interview
 
@@ -211,6 +211,21 @@ Usually, I would locate those files in the app repo, not in the Chart repo.
 
 `helm upgrade --install ornikar-world ./ornikar-helm-chart/. -f ./ornikar-helm-chart/world-values.yaml`
 
+### some outputs
+
+````
+k get ingress
+NAME                               CLASS   HOSTS         ADDRESS        PORTS   AGE
+ornikar-hello-ornikar-helm-chart   nginx   ornikar.dev   192.168.49.2   80      6h4m
+ornikar-world-ornikar-helm-chart   nginx   ornikar.dev   192.168.49.2   80      60m
+````
+
+````
+helm list
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS  CHART                    APP VERSION
+ornikar-hello   default         7               2022-02-28 00:09:50.452959 +0100 CET    deployedornikar-helm-chart-0.1.0 1.16.0     
+ornikar-world   default         3               2022-02-28 00:31:33.010568 +0100 CET    deployedornikar-helm-chart-0.1.0 1.16.0   
+````
 
 ## final test
 
@@ -231,3 +246,5 @@ Php server executed through composer seems to have a sort of timeout. It never p
 
 I know the Kube Service associated with it worked as I got the "World" displayed while testing the Service. But even directly in Docker it does not work properly.
 I guess, I'd have to dig in Php. But, unfortunately, I don't have the time for that :( .
+
+Cheers :) !
